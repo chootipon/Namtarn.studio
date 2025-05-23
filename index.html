@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สมัครคอร์สเบเกอรี่</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      padding: 1rem;
+      background: linear-gradient(to bottom right, #fefefe, #e8f0fe); /* Soft, modern gradient */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #343a40; /* Default text color */
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: #1a1a1a;
+      font-weight: 700;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+      letter-spacing: 0.5px;
+    }
+    .container {
+      flex-grow: 1;
+      padding-bottom: 100px; /* Space for fixed cart & calendar icons */
+    }
+    .profile-section {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 1.2rem 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border: 1px solid #e9ecef;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .profile-pic {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f06595;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    .profile-section strong {
+      font-size: 1.25rem;
+      color: #212529;
+      font-weight: 600;
+    }
+
+    .course-card {
+      background: #ffffff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      margin-bottom: 28px;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      border: 1px solid #f0f0f0;
+      animation: slideInUp 0.6s ease-out;
+    }
+    .course-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+    }
+    .course-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 1px solid #f8f9fa;
+    }
+    .course-body {
+      padding: 1.8rem;
+    }
+    .course-body h5 {
+      color: #333;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      font-size: 1.5rem;
+    }
+    .course-body p {
+      color: #555;
+      margin-bottom: 1.2rem;
+      font-size: 1.1rem;
+    }
+    .enroll-btn {
+      background: linear-gradient(to right, #ff7e5f, #feb47b); /* Coral gradient */
+      color: white;
+      border: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(255, 126, 95, 0.3);
+    }
+    .enroll-btn:hover:not(:disabled) { /* Apply hover only when not disabled */
+      background: linear-gradient(to right, #ff6a4b, #fe9d5a);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(255, 126, 95, 0.4);
+    }
+    .enroll-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background: #cccccc !important; /* Grey out disabled button */
+        color: #666666 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+
+    /* Floating Icons Wrapper */
+    .floating-icons-wrapper {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Space between icons */
+        z-index: 1050;
+    }
+
+    /* Floating Cart Icon */
+    #cartIcon, #calendarIcon {
+      background: #f06595; /* Pink color, matching primary button */
+      color: white;
+      border-radius: 50%;
+      width: 65px;
+      height: 65px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 30px;
+      box-shadow: 0 8px 18px rgba(240, 101, 149, 0.3); /* Pink shadow */
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    #cartIcon {
+        position: relative; /* Add this for cartCount to position correctly */
+    }
+    #cartIcon:hover, #calendarIcon:hover {
+      background: #e05c8a; /* Darker pink on hover */
+      transform: scale(1.08);
+      box-shadow: 0 10px 22px rgba(240, 101, 149, 0.4);
+    }
+
+    /* Cart Count Badge */
+    #cartCount {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #dc3545; /* Bootstrap danger red */
+      color: white;
+      font-size: 14px;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    #cartCount.hide {
+      display: none;
+    }
+
+    /* Cart Modal Item Styling */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 1.2rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px solid #f1f3f5;
+      transition: background-color 0.2s ease;
+    }
+    .cart-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .cart-item img {
+      width: 100px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    .cart-item-details {
+      flex-grow: 1;
+    }
+    .cart-item-details h6 {
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+    .cart-item-details p {
+      margin-bottom: 3px;
+      font-size: 0.95rem;
+      color: #666;
+    }
+    .cart-item-actions {
+        display: flex; /* Use flexbox for button alignment */
+        gap: 8px; /* Space between buttons */
+    }
+    .cart-item-actions button {
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+    }
+    .cart-item-actions button:hover:not(.disabled) {
+      transform: translateY(-2px);
+    }
+
+    /* Status Badges */
+    .status-badge {
+      font-size: 0.88rem;
+      padding: 0.4em 0.8em;
+      border-radius: 25px;
+      color: white;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: 5px;
+    }
+    .status-pending { background-color: #ffc107; color: #343a40; } /* Bootstrap warning */
+    .status-approved { background-color: #28a745; } /* Bootstrap success */
+    .status-rejected { background-color: #dc3545; } /* Bootstrap danger */
+
+    /* Disabled Buttons */
+    .btn.disabled, button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none !important; /* Remove shadow when disabled */
+      transform: none !important; /* No hover effect when disabled */
+    }
+    .btn.disabled.btn-warning, .btn.disabled.btn-danger {
+        background-color: #cccccc !important; /* Grey out disabled buttons */
+        border-color: #cccccc !important;
+        color: #666666 !important;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    .modal-header {
+      border-bottom: none;
+      padding: 1.8rem 2.2rem 1.2rem;
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+    .modal-title {
+      font-weight: 700;
+      color: #333;
+      font-size: 1.7rem;
+    }
+    .modal-body {
+      padding: 1.5rem 2.2rem 1.8rem;
+    }
+    .modal-footer {
+      border-top: none;
+      padding: 1.2rem 2.2rem 1.8rem;
+    }
+    .form-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 0.6rem;
+      font-size: 1.05rem;
+    }
+    .form-control {
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      border: 1px solid #ced4da;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-size: 1.05rem;
+    }
+    .form-control:focus {
+      border-color: #f06595;
+      box-shadow: 0 0 0 0.25rem rgba(240, 101, 149, 0.2);
+    }
+    .alert-info {
+      background-color: #e0f2f7; /* Light blue */
+      border-color: #b3e5fc;
+      color: #01579b;
+      font-weight: 500;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+    }
+    .btn-primary {
+      background-color: #f06595;
+      border-color: #f06595;
+      font-weight: 600;
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(240, 101, 149, 0.3);
+    }
+    .btn-primary:hover:not(:disabled) { /* Apply hover only when not disabled */
+      background-color: #e05c8a;
+      border-color: #e05c8a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(240, 101, 149, 0.4);
+    }
+    .btn-primary:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background-color: #cccccc !important;
+        border-color: #cccccc !important;
+        color: #666666 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+      font-weight: 600;
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    }
+    .btn-success:hover:not(:disabled) {
+      background-color: #218838;
+      border-color: #1e7e34;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+    }
+    .btn-secondary {
+      font-weight: 600;
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* FullCalendar Customizations */
+    .fc {
+        font-family: 'Sarabun', sans-serif;
+        background-color: #ffffff; /* White background for calendar */
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+    }
+    .fc-toolbar-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #f06595; /* Pink title */
+    }
+    .fc-button {
+        background-color: #f06595 !important;
+        border-color: #f06595 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(240, 101, 149, 0.2);
+        transition: all 0.2s ease;
+        margin: 0 4px !important; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    }
+    .fc-button:hover {
+        background-color: #e05c8a !important;
+        border-color: #e05c8a !important;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(240, 101, 149, 0.3);
+    }
+
+    /* จัดช่องไฟปุ่ม toolbar group */
+    .fc-button-group {
+        display: flex;
+        gap: 8px; /* ระยะห่างระหว่างกลุ่มปุ่ม */
+    }
+    .fc-toolbar-chunk:nth-child(1) .fc-button-group { /* Left group */
+        margin-right: 15px; /* ระยะห่างระหว่าง Prev/Next/Today กับ Title */
+    }
+     .fc-toolbar-chunk:nth-child(3) .fc-button-group { /* Right group */
+        margin-left: 15px; /* ระยะห่างระหว่าง Title กับ Views */
+    }
+
+    .fc-daygrid-day-number {
+        font-size: 1em;
+        font-weight: 600;
+        color: #343a40;
+    }
+    .fc-col-header-cell-cushion {
+        font-weight: 700;
+        color: #f06595; /* Day names color */
+    }
+
+    /* Event dots/labels */
+    .fc-event {
+        border: none !important;
+        background-color: transparent !important;
+        color: #333 !important; /* Default text color for events */
+        font-size: 0.75em; /* ลดขนาดตัวอักษรของ Event */
+        font-weight: 600;
+        padding: 1px 0;
+        display: flex;
+        align-items: center;
+        margin-top: 2px;
+        white-space: nowrap; /* ป้องกันไม่ให้ข้อความขึ้นบรรทัดใหม่ */
+        overflow: hidden; /* ซ่อนข้อความที่เกิน */
+        text-overflow: ellipsis; /* แสดง ... เมื่อข้อความเกิน */
+    }
+    .fc-event-main-frame {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        gap: 4px; /* ลดระยะห่างระหว่างจุดกับข้อความ */
+    }
+    .status-dot {
+        width: 8px; /* ลดขนาดจุด */
+        height: 8px; /* ลดขนาดจุด */
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .dot-pending { background-color: #ffc107; } /* เหลืองจอง */
+    .dot-approved { background-color: #28a745; } /* เขียวสอน */
+    .dot-rejected { background-color: #dc3545; } /* แดงยกเลิก */
+
+    /* "ว่าง" label for empty days */
+    .fc-daygrid-day-frame.empty-day .fc-daygrid-day-bottom {
+        text-align: center;
+        margin-top: 5px;
+        font-size: 0.8em; /* ลดขนาดตัวอักษร "ว่าง" */
+        color: #28a745; /* เขียวว่าง */
+        font-weight: 600;
+        opacity: 0.7;
+    }
+
+    /* ปรับความสูงของช่องวันเพื่อให้เห็น Event ได้ดีขึ้น */
+    .fc-daygrid-day-frame {
+        min-height: 80px; /* กำหนดความสูงขั้นต่ำของช่องวัน */
+    }
+    /* เมื่อมีหลาย event ให้มี scroll ได้ในช่องวัน (ไม่จำเป็นถ้า event ถูกตัดเหลือ 1 บรรทัด) */
+    .fc-daygrid-day-events {
+        max-height: 60px; /* จำกัดความสูงของส่วนแสดง events */
+        overflow-y: auto; /* เปิด scrollbar ถ้า event เยอะเกิน */
+        padding-right: 5px; /* เผื่อที่ให้ scrollbar */
+    }
+    /* Scrollbar minimal style */
+    .fc-daygrid-day-events::-webkit-scrollbar {
+        width: 4px;
+    }
+    .fc-daygrid-day-events::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    .fc-daygrid-day-events::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+    .fc-daygrid-day-events::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<h1><i class="bi bi-cake2-fill text-danger"></i> Namtarn.studio</h1>
+
+<div class="container">
+  <div id="profile" class="profile-section">
+    <img id="profilePic" src="" class="profile-pic" alt="Profile Picture" />
+    <div><strong id="profileName"></strong></div>
+  </div>
+
+  <div id="courses" class="row row-cols-1 row-cols-md-2 g-4">กำลังโหลดคอร์ส...</div>
+</div>
+
+<div class="floating-icons-wrapper">
+  <div id="calendarIcon" title="ดูปฏิทินคอร์ส">
+    <i class="bi bi-calendar-event"></i>
+  </div>
+  <div id="cartIcon" title="ตะกร้าคอร์ส">
+    <i class="bi bi-cart"></i>
+    <div id="cartCount" class="hide">0</div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="enrollModal" tabindex="-1" aria-labelledby="enrollModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="enrollForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="enrollModalLabel">สมัครคอร์สเบเกอรี่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="docId" />
+        <input type="hidden" id="courseName" />
+        <input type="hidden" id="coursePrice" />
+        <input type="hidden" id="courseImage" /> <div class="mb-3">
+          <label for="fullname" class="form-label">ชื่อ - นามสกุล</label>
+          <input type="text" class="form-control" id="fullname" required />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">อีเมล</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">เบอร์โทร</label>
+          <input type="tel" class="form-control" id="phone" required />
+        </div>
+        <div class="mb-3">
+          <label for="date" class="form-label">เลือกวันที่เรียน</label>
+          <input type="date" class="form-control" id="date" required />
+          <div id="dateAvailabilityFeedback" class="text-danger mt-1" style="font-size: 0.9em;"></div>
+        </div>
+        <div class="alert alert-info py-2 px-3 mt-3">
+          <strong>คอร์ส:</strong> <span id="previewCourse"></span><br />
+          <strong>ราคา:</strong> <span id="previewPrice"></span> บาท
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id="submitBtn">ยืนยันสมัคร</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">แก้ไขข้อมูลการสมัคร</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editDocId" />
+        <div class="mb-3">
+          <label for="editFullname" class="form-label">ชื่อ - นามสกุล</label>
+          <input type="text" class="form-control" id="editFullname" required />
+        </div>
+        <div class="mb-3">
+          <label for="editEmail" class="form-label">อีเมล</label>
+          <input type="email" class="form-control" id="editEmail" required />
+        </div>
+        <div class="mb-3">
+          <label for="editPhone" class="form-label">เบอร์โทร</label>
+          <input type="tel" class="form-control" id="editPhone" required />
+        </div>
+        <div class="mb-3">
+          <label for="editDate" class="form-label">เลือกวันที่เรียน</label>
+          <input type="date" class="form-control" id="editDate" required />
+          <div id="editDateAvailabilityFeedback" class="text-danger mt-1" style="font-size: 0.9em;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success" id="saveEditBtn">บันทึกการแก้ไข</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">รายการคอร์สที่สมัคร</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body" id="cartItemsContainer">
+        กำลังโหลดรายการ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="calendarModalLabel">ปฏิทินการจองคอร์ส</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body">
+        <div id="calendar"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import {
+    getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp,
+    onSnapshot, doc, updateDoc, deleteDoc, getDoc
+  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  // *** ตั้งค่า Firebase ของคุณที่นี่ ***
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4ZWlAk3456D_IsB7Zk0ud23gTr4bRbxg", // เปลี่ยนเป็น API Key ของคุณ
+    authDomain: "baking-course-register.firebaseapp.com",
+    projectId: "baking-course-register",
+    storageBucket: "baking-course-register.appspot.com",
+    messagingSenderId: "118926242712",
+    appId: "1:118926242712:web:039855058a8fb72131b1ed",
+    measurementId: "G-C0XVB5Q6FB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // *** ตั้งค่า LIFF ID ของคุณที่นี่ ***
+  const LIFF_ID = '2007448852-pEa5og86'; // เปลี่ยนเป็น LIFF ID ของคุณ
+
+  let coursesData = [];
+  let liffUserId = '';
+  let userRegistrations = []; // เก็บรายการสมัครของ user ปัจจุบัน
+  let allRegistrations = []; // เก็บรายการสมัครทั้งหมดสำหรับ Calendar
+
+  const enrollModal = new bootstrap.Modal(document.getElementById('enrollModal'));
+  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+  const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+  const calendarModal = new bootstrap.Modal(document.getElementById('calendarModal')); // New: Calendar Modal
+  const cartCountElem = document.getElementById('cartCount');
+
+  const enrollDateInput = document.getElementById('date');
+  const dateAvailabilityFeedback = document.getElementById('dateAvailabilityFeedback');
+  const editDateInput = document.getElementById('editDate');
+  const editDateAvailabilityFeedback = document.getElementById('editDateAvailabilityFeedback');
+  const submitBtn = document.getElementById('submitBtn');
+  const saveEditBtn = document.getElementById('saveEditBtn');
+
+  let fullCalendarInstance = null; // To store FullCalendar instance
+
+  let wasCartModalOpen = false;
+
+  async function loadCourses() {
+    const q = query(collection(db, "courses"), where("active", "==", true));
+    try {
+      const querySnapshot = await getDocs(q);
+      coursesData = [];
+      querySnapshot.forEach(doc => {
+        coursesData.push({ id: doc.id, ...doc.data() });
+      });
+      displayCourses();
+    } catch (error) {
+      console.error("Error loading courses: ", error);
+      document.getElementById("courses").innerHTML = `<div class="col"><p class="text-danger">ไม่สามารถโหลดคอร์สได้ในขณะนี้</p></div>`;
+    }
+  }
+
+  // ฟังก์ชันแสดงผลคอร์ส
+  function displayCourses() {
+    const courseList = document.getElementById("courses");
+    if (coursesData.length === 0) {
+      courseList.innerHTML = `<div class="col-12 text-center py-5"><p class="text-muted">ไม่พบคอร์สที่เปิดสอนในขณะนี้</p></div>`;
+      return;
+    }
+    courseList.innerHTML = '';
+    coursesData.forEach(course => {
+      const existingEnrollment = userRegistrations.find(reg => reg.courseName === course.title && (reg.status === 'pending' || reg.status === 'approved'));
+      let buttonText = 'สมัครคอร์สนี้';
+      let buttonClass = 'btn-danger';
+      let buttonDisabled = '';
+
+      if (existingEnrollment) {
+        buttonText = 'สมัครแล้ว';
+        buttonClass = 'btn-secondary'; // เปลี่ยนสีปุ่ม
+        buttonDisabled = 'disabled'; // ปิดการใช้งานปุ่ม
+      }
+
+      const courseHTML = `
+        <div class="col">
+          <div class="course-card">
+            <img src="${course.image}" alt="${course.title}" />
+            <div class="course-body">
+              <h5>${course.title}</h5>
+              <p>${course.description || ''}</p>
+              <p><strong>ราคา:</strong> ${course.price} บาท</p>
+              <button class="enroll-btn btn ${buttonClass}" data-id="${course.id}" ${buttonDisabled}>${buttonText}</button>
+            </div>
+          </div>
+        </div>
+      `;
+      courseList.insertAdjacentHTML('beforeend', courseHTML);
+    });
+
+    document.querySelectorAll(".enroll-btn").forEach(btn => {
+      if (!btn.disabled) { // Attach event listener only if not disabled
+        btn.addEventListener("click", e => {
+          const courseId = e.target.getAttribute("data-id");
+          openEnrollModal(courseId);
+        });
+      }
+    });
+  }
+
+  function openEnrollModal(courseId) {
+    const course = coursesData.find(c => c.id === courseId);
+    if (!course) {
+      alert("ไม่พบข้อมูลคอร์ส");
+      return;
+    }
+
+    document.getElementById('docId').value = ''; // Clear for new enrollment
+    document.getElementById('courseName').value = course.title;
+    document.getElementById('coursePrice').value = course.price;
+    document.getElementById('courseImage').value = course.image; // เก็บ image URL
+    document.getElementById('previewCourse').textContent = course.title;
+    document.getElementById('previewPrice').textContent = course.price;
+
+    document.getElementById('fullname').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('date').value = '';
+    dateAvailabilityFeedback.textContent = ''; // Clear feedback
+    submitBtn.disabled = false; // Enable submit button by default
+
+    // Set min date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').min = today;
+
+    enrollModal.show();
+  }
+
+  // --- Date availability check logic ---
+  async function checkDateAvailability(selectedDate, currentRegId = null) {
+    if (!selectedDate) {
+        dateAvailabilityFeedback.textContent = 'กรุณาเลือกวันที่เรียน';
+        return false;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (selectedDate < today) {
+        dateAvailabilityFeedback.textContent = 'ไม่สามารถเลือกวันที่ผ่านมาแล้วได้';
+        return false;
+    }
+
+    // 1. Check if user already has another course on this date
+    const existingPersonalCourse = userRegistrations.find(reg => 
+        reg.date === selectedDate && reg.id !== currentRegId && (reg.status === 'pending' || reg.status === 'approved')
+    );
+    if (existingPersonalCourse) {
+        dateAvailabilityFeedback.textContent = `คุณได้สมัครคอร์ส "${existingPersonalCourse.courseName}" ในวันที่นี้แล้ว`;
+        return false;
+    }
+
+    // 2. Check if this date is already booked by another user for any course
+    // Use allRegistrations which is updated in real-time
+    const q = query(collection(db, "course_registrations"), 
+                    where("date", "==", selectedDate),
+                    where("status", "in", ["pending", "approved"]) // Check both pending and approved
+    );
+    const querySnapshot = await getDocs(q); // Fetch fresh data for this specific check
+
+    // Check if the current selected date is already taken by someone else
+    const isDateTakenByOthers = querySnapshot.docs.some(docSnap => docSnap.id !== currentRegId);
+
+    if (isDateTakenByOthers) {
+        dateAvailabilityFeedback.textContent = 'วันนี้มีผู้สมัครเต็มแล้ว กรุณาเลือกวันอื่น';
+        return false;
+    }
+
+    dateAvailabilityFeedback.textContent = ''; // Clear feedback if available
+    return true;
+  }
+
+  // Event listener for date input in enroll modal
+  enrollDateInput.addEventListener('change', async () => {
+    const isAvailable = await checkDateAvailability(enrollDateInput.value);
+    submitBtn.disabled = !isAvailable;
+  });
+
+  // Event listener for date input in edit modal
+  editDateInput.addEventListener('change', async () => {
+    const currentRegId = document.getElementById('editDocId').value;
+    const isAvailable = await checkDateAvailability(editDateInput.value, currentRegId);
+    saveEditBtn.disabled = !isAvailable;
+  });
+
+
+  async function submitEnrollment(e) {
+    e.preventDefault();
+
+    const courseName = document.getElementById('courseName').value;
+    const coursePrice = document.getElementById('coursePrice').value;
+    const courseImage = document.getElementById('courseImage').value;
+    const fullname = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const date = document.getElementById('date').value;
+
+    if (!fullname || !email || !phone || !date) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    // Re-check date availability before final submission
+    const isDateAvailable = await checkDateAvailability(date);
+    if (!isDateAvailable) {
+        alert("วันที่เลือกไม่พร้อมใช้งาน กรุณาเลือกวันอื่น");
+        return;
+    }
+
+    // Check if the user has already enrolled in this specific course
+    const alreadyEnrolledInCourse = userRegistrations.some(reg => 
+        reg.courseName === courseName && (reg.status === 'pending' || reg.status === 'approved')
+    );
+    if (alreadyEnrolledInCourse) {
+        alert("คุณได้สมัครคอร์สนี้ไปแล้ว ไม่สามารถสมัครซ้ำได้");
+        return;
+    }
+
+
+    try {
+      await addDoc(collection(db, "course_registrations"), {
+        courseName: courseName,
+        coursePrice: Number(coursePrice),
+        createdAt: serverTimestamp(),
+        date: date,
+        email: email,
+        fullname: fullname,
+        phone: phone,
+        status: "pending",
+        userId: liffUserId,
+        imageurl: courseImage // ใช้ image URL ที่ดึงมาจาก courseData
+      });
+
+      alert("สมัครคอร์สเรียบร้อยแล้ว รอการอนุมัติ");
+      enrollModal.hide();
+      // onSnapshot will handle cart update and re-render course buttons
+    } catch (error) {
+      console.error("Error submitting enrollment: ", error);
+      alert("เกิดข้อผิดพลาดในการสมัคร กรุณาลองใหม่อีกครั้ง: " + error.message);
+    }
+  }
+
+  // Load all registrations for calendar and user's registrations for cart/enrollment checks
+  function setupAllRegistrationsListener() {
+    const q = collection(db, "course_registrations");
+
+    onSnapshot(q, snapshot => {
+      allRegistrations = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+
+      // Filter user's own registrations
+      userRegistrations = allRegistrations.filter(reg => reg.userId === liffUserId);
+
+      displayCartItems(userRegistrations); // Update cart modal
+      displayCourses(); // Re-render course cards to update button states (สมัครแล้ว/สมัครคอร์สนี้)
+      // Render calendar will be called when modal is opened, or when data updates if modal is already open
+      if (calendarModal._isShown) { // Check if calendar modal is currently open
+        renderCalendar(); // Re-render if open to show updated data
+      }
+    }, (error) => {
+        console.error("Error fetching all registrations: ", error);
+    });
+  }
+
+
+  // โหลดข้อมูลรายการสมัครคอร์สในตะกร้า (Realtime)
+  function displayCartItems(registrations) { // รับ registrations ที่กรองแล้ว
+    const container = document.getElementById('cartItemsContainer');
+
+    if (registrations.length === 0) {
+      container.innerHTML = '<p class="text-center text-muted py-3">คุณยังไม่มีรายการคอร์สที่สมัคร</p>';
+      cartCountElem.textContent = '0';
+      cartCountElem.classList.add('hide'); // Hide badge if count is 0
+      return;
+    }
+
+    let itemCount = 0;
+    container.innerHTML = '';
+    registrations.forEach(reg => {
+        itemCount++;
+        const statusClass = reg.status === "approved" ? "status-approved"
+                          : reg.status === "rejected" ? "status-rejected"
+                          : "status-pending";
+
+        const isApproved = reg.status === "approved";
+        const editBtnDisabled = isApproved ? 'disabled' : '';
+        const deleteBtnDisabled = isApproved ? 'disabled' : '';
+
+        const editBtnHtml = `<button class="btn btn-sm btn-warning edit-btn" title="แก้ไขข้อมูล" data-id="${reg.id}" ${editBtnDisabled}><i class="bi bi-pencil-square"></i></button>`;
+        const deleteBtnHtml = `<button class="btn btn-sm btn-danger delete-btn" title="ลบรายการ" data-id="${reg.id}" ${deleteBtnDisabled}><i class="bi bi-trash"></i></button>`;
+
+        container.insertAdjacentHTML('beforeend',
+          `<div class="cart-item" data-id="${reg.id}" data-status="${reg.status}">
+            <img src="${reg.imageurl || 'https://via.placeholder.com/100x80?text=No+Image'}" alt="${reg.courseName}" />
+            <div class="cart-item-details">
+              <h6>${reg.courseName}</h6>
+              <p>ราคา: ${reg.coursePrice} บาท</p>
+              <p>วันที่เรียน: ${reg.date}</p>
+              <p>สถานะ: <span class="status-badge ${statusClass}">${reg.status}</span></p>
+            </div>
+            <div class="cart-item-actions">
+              ${editBtnHtml}
+              ${deleteBtnHtml}
+            </div>
+          </div>`
+        );
+      });
+
+      cartCountElem.textContent = itemCount.toString();
+      cartCountElem.classList.remove('hide'); // Show badge if count > 0
+
+      // Attach event listeners for buttons in cart items (delegation is better for dynamic content but for simplicity, re-attaching)
+      document.querySelectorAll('#cartItemsContainer .edit-btn').forEach(btn => {
+        btn.onclick = (e) => { // Use onclick directly for re-attached elements
+          const id = e.currentTarget.dataset.id;
+          if (e.currentTarget.disabled) return;
+          if (cartModal._isShown) {
+            wasCartModalOpen = true;
+            cartModal.hide();
+            document.getElementById('cartModal').addEventListener('hidden.bs.modal', function handler() {
+                openEditModal(id);
+                this.removeEventListener('hidden.bs.modal', handler);
+            });
+          } else {
+            wasCartModalOpen = false;
+            openEditModal(id);
+          }
+        };
+      });
+
+      document.querySelectorAll('#cartItemsContainer .delete-btn').forEach(btn => {
+        btn.onclick = async (e) => { // Use onclick directly for re-attached elements
+          const id = e.currentTarget.dataset.id;
+          if (e.currentTarget.disabled) return;
+          if (confirm('คุณแน่ใจหรือไม่ที่ต้องการลบรายการนี้?')) {
+            try {
+              await deleteDoc(doc(db, "course_registrations", id));
+              alert('ลบรายการเรียบร้อยแล้ว!');
+            } catch (err) {
+              console.error("Error deleting document: ", err);
+              alert('เกิดข้อผิดพลาดในการลบรายการ: ' + err.message);
+            }
+          }
+        };
+      });
+  }
+
+  // เปิด modal แก้ไขข้อมูล
+  async function openEditModal(docId) {
+    try {
+      const docRef = doc(db, "course_registrations", docId);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) {
+        alert('ไม่พบข้อมูลรายการที่คุณต้องการแก้ไข');
+        return;
+      }
+
+      const data = docSnap.data();
+      if (data.status === "approved") {
+        alert('ไม่สามารถแก้ไขรายการที่สถานะเป็น "approved" ได้');
+        return;
+      }
+
+      document.getElementById('editDocId').value = docId;
+      document.getElementById('editFullname').value = data.fullname || '';
+      document.getElementById('editEmail').value = data.email || '';
+      document.getElementById('editPhone').value = data.phone || '';
+      document.getElementById('editDate').value = data.date || '';
+      editDateAvailabilityFeedback.textContent = ''; // Clear feedback
+      saveEditBtn.disabled = false; // Enable save button by default
+
+      // Set min date to today for edit modal
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('editDate').min = today;
+
+      editModal.show();
+    } catch (err) {
+      console.error("Error opening edit modal: ", err);
+      alert('เกิดข้อผิดพลาดในการดึงข้อมูลเพื่อแก้ไข: ' + err.message);
+    }
+  }
+
+  // บันทึกแก้ไขข้อมูล
+  document.getElementById('editForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const docId = document.getElementById('editDocId').value;
+    const fullname = document.getElementById('editFullname').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const date = document.getElementById('editDate').value;
+
+    if (!fullname || !email || !phone || !date) {
+      alert('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+      return;
+    }
+
+    // Re-check date availability before final submission
+    const isDateAvailable = await checkDateAvailability(date, docId);
+    if (!isDateAvailable) {
+        alert("วันที่เลือกไม่พร้อมใช้งาน กรุณาเลือกวันอื่น");
+        return;
+    }
+
+    try {
+      const docRef = doc(db, "course_registrations", docId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists() && docSnap.data().status === "approved") {
+        alert('ไม่สามารถแก้ไขรายการที่สถานะเป็น "approved" ได้');
+        editModal.hide();
+        return;
+      }
+
+      await updateDoc(docRef, { fullname, email, phone, date });
+      alert('บันทึกข้อมูลเรียบร้อยแล้ว!');
+      editModal.hide();
+
+      if (wasCartModalOpen) {
+        cartModal.show();
+      }
+    } catch (err) {
+      console.error("Error updating document: ", err);
+      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + err.message);
+    }
+  });
+
+  document.getElementById('editModal').addEventListener('hidden.bs.modal', function () {
+    if (wasCartModalOpen) {
+      cartModal.show();
+    }
+  });
+
+  document.getElementById('cartIcon').addEventListener('click', () => {
+    cartModal.toggle();
+  });
+
+  // --- FullCalendar Integration ---
+  function renderCalendar() {
+    const calendarEl = document.getElementById('calendar');
+
+    // Destroy existing instance if it exists to prevent duplicates and ensure fresh render
+    if (fullCalendarInstance) {
+        fullCalendarInstance.destroy();
+    }
+
+    const events = allRegistrations.map(reg => {
+      let statusLabel;
+      if (reg.status === 'pending') {
+        statusLabel = 'จอง';
+      } else if (reg.status === 'approved') {
+        statusLabel = 'สอน';
+      } else if (reg.status === 'rejected') {
+        statusLabel = 'ยกเลิก';
+      } else {
+        statusLabel = 'สถานะอื่น';
+      }
+
+      return {
+        id: reg.id,
+        // Shorten title to avoid overflow and highlight essential info
+        title: `${statusLabel}: ${reg.courseName}`, 
+        start: reg.date,
+        allDay: true,
+        extendedProps: {
+            status: reg.status,
+            courseName: reg.courseName,
+            fullname: reg.fullname // Keep fullname for potential future use or detailed view
+        }
+      };
+    });
+
+    fullCalendarInstance = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'th',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,dayGridWeek' // Add dayGridWeek for more views
+      },
+      events: events,
+      eventDidMount: function(info) {
+          // Custom rendering for event content (dot + text)
+          const dotColor = info.event.extendedProps.status === 'pending' ? '#ffc107'
+                         : info.event.extendedProps.status === 'approved' ? '#28a745'
+                         : info.event.extendedProps.status === 'rejected' ? '#dc3545'
+                         : '#6c757d'; // Default grey
+
+          const dotElement = document.createElement('span');
+          dotElement.classList.add('status-dot');
+          dotElement.style.backgroundColor = dotColor;
+
+          const textElement = document.createElement('span');
+          textElement.textContent = info.event.title; // Use the shortened title
+          textElement.style.color = '#333'; 
+
+          info.el.querySelector('.fc-event-title-container').innerHTML = ''; // Clear default title
+          info.el.querySelector('.fc-event-title-container').appendChild(dotElement);
+          info.el.querySelector('.fc-event-title-container').appendChild(textElement);
+      },
+      dayCellDidMount: function(info) {
+          // Add "ว่าง" label if no events on this day that are not rejected
+          const dateStr = info.date.toISOString().split('T')[0];
+          // Check for events that are pending or approved
+          const hasActiveEvents = events.some(event => event.start === dateStr && (event.extendedProps.status === 'pending' || event.extendedProps.status === 'approved'));
+
+          if (!hasActiveEvents) {
+              const emptyLabel = document.createElement('div');
+              emptyLabel.classList.add('fc-daygrid-day-bottom');
+              emptyLabel.textContent = 'ว่าง';
+              info.el.classList.add('empty-day');
+              // Append to the frame's bottom section
+              info.el.querySelector('.fc-daygrid-day-frame').appendChild(emptyLabel);
+          }
+      },
+      // Optional: limit number of events shown in a day cell before "more" link appears
+      dayMaxEvents: 2, // Show up to 2 events, then "X more"
+      views: {
+        dayGridMonth: {
+          eventLimit: 2 // Adjust to control event display in month view
+        }
+      }
+    });
+
+    fullCalendarInstance.render();
+  }
+
+  // Event listener for Calendar Icon
+  document.getElementById('calendarIcon').addEventListener('click', () => {
+    calendarModal.show();
+    // Render calendar when modal is shown to ensure it's visible and correctly sized
+    calendarModal._element.addEventListener('shown.bs.modal', function handler() {
+        renderCalendar();
+        this.removeEventListener('shown.bs.modal', handler); // Remove after first show
+    });
+    // For subsequent shows, just re-render if it was already initialized and modal is open
+    if (fullCalendarInstance) {
+        fullCalendarInstance.render();
+    }
+  });
+
+
+  // --- Initialization ---
+  async function initPage() {
+    try {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) await liff.login();
+
+      const profile = await liff.getProfile();
+      document.getElementById("profilePic").src = profile.pictureUrl;
+      document.getElementById("profileName").innerText = profile.displayName;
+      liffUserId = profile.userId;
+
+      // Load courses first
+      await loadCourses();
+      // Then set up listener for all registrations (which will also update user's registrations and render calendar)
+      setupAllRegistrationsListener();
+
+    } catch (err) {
+      console.error("LIFF/Initialization Error: ", err);
+      document.getElementById("courses").innerHTML = `<p class="text-danger">เกิดข้อผิดพลาดในการโหลดข้อมูล LIFF หรือ Firebase: ${err.message}</p>`;
+      // Fallback for local testing without LIFF:
+      // liffUserId = 'mockUserId123';
+      // document.getElementById('profileName').textContent = 'ผู้ใช้งานทดสอบ (Local)';
+      // document.getElementById('profilePic').src = 'https://via.placeholder.com/75?text=Dev';
+      // await loadCourses();
+      // setupAllRegistrationsListener();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", initPage);
+  document.getElementById('enrollForm').addEventListener('submit', submitEnrollment);
+</script>
+
+</body>
+</html>
+
